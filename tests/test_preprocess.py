@@ -54,3 +54,15 @@ def test_processed_data_has_expected_columns():
     for col in EXPECTED_COLUMNS:
         assert col in result.columns, f"Expected column '{col}' missing after preprocessing"
 
+def test_remove_outliers_removes_invalid_entries():
+    """remove_outliers should remove rows with invalid values."""
+    df = make_mini_df()
+    # Introduce some outliers
+    df.loc[0, "age"] = -5
+    df.loc[1, "RevolvingUtilizationOfUnsecuredLines"] = 1.5
+    result = remove_outliers(df)
+    # Check that the outliers have been removed
+    assert (result["age"] > 0).all(), "Rows with age <= 0 were not removed"
+    assert (result["RevolvingUtilizationOfUnsecuredLines"] <= 1.0).all(), "Rows with RevolvingUtilizationOfUnsecuredLines > 1.0 were not removed"
+
+
